@@ -10,9 +10,8 @@
         .header { background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .header h1 { font-size: 24px; margin-bottom: 5px; }
         .header p { opacity: 0.8; font-size: 14px; }
-        .pinned-doc { background: rgba(255,255,255,0.15); padding: 10px 16px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
-        .pinned-doc a { color: white; text-decoration: none; font-weight: 500; }
-        .pinned-doc a:hover { text-decoration: underline; }
+        .pdf-btn { background: #e53e3e; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .pdf-btn:hover { background: #c53030; }
         .stats { display: flex; gap: 15px; padding: 20px; flex-wrap: wrap; }
         .stat-card { background: white; border-radius: 12px; padding: 20px; flex: 1; min-width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .stat-card h3 { font-size: 32px; color: #1a365d; }
@@ -32,10 +31,6 @@
         .status-contacted { background: #fefcbf; color: #975a16; }
         .status-waiting { background: #bee3f8; color: #2b6cb0; }
         .status-resolved { background: #c6f6d5; color: #276749; }
-        .btn { background: #2c5282; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-        .btn:hover { background: #1a365d; }
-        .btn-secondary { background: #718096; }
-        .btn-secondary:hover { background: #4a5568; }
         .phone-link { color: #2c5282; text-decoration: none; }
         .notes-cell { max-width: 200px; }
         .notes-input { width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 13px; }
@@ -55,9 +50,9 @@
             <h1>🔄 Retention Workflow - Unresolved Cases</h1>
             <p>Marketing coordination with reps • Reps update status when resolved</p>
         </div>
-        <div class="pinned-doc">
-            📌 <a href="retention-guide.pdf" target="_blank">Retention Guide (PDF)</a>
-        </div>
+        <a href="retention-guide.pdf" target="_blank" class="pdf-btn">
+            📄 Retention Guide (PDF)
+        </a>
     </div>
     
     <div class="stats">
@@ -95,7 +90,6 @@
             <option value="capitol">Capitol Injury</option>
         </select>
         <input type="text" placeholder="🔍 Search client name or phone..." style="width: 250px;">
-        <button class="btn btn-secondary">📤 Export to Sheet</button>
     </div>
 
     <div class="tabs">
