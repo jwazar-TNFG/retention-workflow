@@ -7,9 +7,12 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%); color: white; padding: 20px; }
+        .header { background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .header h1 { font-size: 24px; margin-bottom: 5px; }
         .header p { opacity: 0.8; font-size: 14px; }
+        .pinned-doc { background: rgba(255,255,255,0.15); padding: 10px 16px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+        .pinned-doc a { color: white; text-decoration: none; font-weight: 500; }
+        .pinned-doc a:hover { text-decoration: underline; }
         .stats { display: flex; gap: 15px; padding: 20px; flex-wrap: wrap; }
         .stat-card { background: white; border-radius: 12px; padding: 20px; flex: 1; min-width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .stat-card h3 { font-size: 32px; color: #1a365d; }
@@ -48,8 +51,13 @@
 </head>
 <body>
     <div class="header">
-        <h1>🔄 Retention Workflow - Unresolved Cases</h1>
-        <p>Marketing coordination with reps • Reps update status when resolved</p>
+        <div>
+            <h1>🔄 Retention Workflow - Unresolved Cases</h1>
+            <p>Marketing coordination with reps • Reps update status when resolved</p>
+        </div>
+        <div class="pinned-doc">
+            📌 <a href="retention-guide.pdf" target="_blank">Retention Guide (PDF)</a>
+        </div>
     </div>
     
     <div class="stats">
