@@ -19,13 +19,14 @@
         .tabs { display: flex; background: white; border-bottom: 2px solid #e2e8f0; padding: 0 20px; overflow-x: auto; }
         .tab { padding: 15px 20px; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; font-weight: 500; color: #666; }
         .tab:hover { background: #f7fafc; }
-        .tab.active { border-bottom-color: #2c5282; color: #1a365d; }
+        .tab.active { border-bottom-color: #2c5282; color: #1a365d; background: #edf2f7; }
         .tab .count { background: #e53e3e; color: white; border-radius: 10px; padding: 2px 8px; font-size: 12px; margin-left: 5px; }
         .content { padding: 20px; }
         table { width: 100%; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         th { background: #1a365d; color: white; padding: 15px; text-align: left; font-weight: 500; }
         td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
         tr:hover { background: #f7fafc; }
+        tr.hidden { display: none; }
         .status-select { padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 13px; cursor: pointer; }
         .status-open { background: #fed7d7; color: #c53030; }
         .status-contacted { background: #fefcbf; color: #975a16; }
@@ -42,6 +43,7 @@
         .age-medium { background: #fefcbf; color: #975a16; }
         .rep-col { font-weight: 500; color: #2c5282; }
         .last-action { font-size: 12px; color: #718096; }
+        .current-filter { padding: 10px 20px; background: #edf2f7; color: #1a365d; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -57,52 +59,52 @@
     
     <div class="stats">
         <div class="stat-card">
-            <h3>47</h3>
+            <h3 id="stat-total">12</h3>
             <p>Total Unresolved</p>
         </div>
         <div class="stat-card">
-            <h3>12</h3>
-            <p>New Today</p>
+            <h3 id="stat-new">5</h3>
+            <p>🔴 New</p>
         </div>
         <div class="stat-card">
-            <h3>18</h3>
-            <p>Contacted</p>
+            <h3 id="stat-contacted">4</h3>
+            <p>🟡 Contacted</p>
         </div>
         <div class="stat-card">
-            <h3>9</h3>
-            <p>Waiting on Client</p>
+            <h3 id="stat-waiting">2</h3>
+            <p>🔵 Waiting</p>
         </div>
     </div>
 
     <div class="filter-bar">
         <select id="statusFilter">
             <option value="">All Statuses</option>
-            <option value="new">New</option>
-            <option value="contacted">Contacted</option>
-            <option value="waiting">Waiting on Client</option>
-            <option value="resolved">Resolved by Rep</option>
+            <option value="new">🔴 New</option>
+            <option value="contacted">🟡 Contacted</option>
+            <option value="waiting">🔵 Waiting</option>
+            <option value="resolved">🟢 Resolved</option>
         </select>
         <select id="attorneyFilter">
             <option value="">All Attorneys</option>
-            <option value="ask-gary">Ask Gary</option>
-            <option value="bader">Bader Law</option>
-            <option value="buckeye">Buckeye Law</option>
-            <option value="capitol">Capitol Injury</option>
+            <option value="Ask Gary">Ask Gary</option>
+            <option value="Bader Law">Bader Law</option>
+            <option value="Buckeye Law">Buckeye Law</option>
+            <option value="Capitol Injury">Capitol Injury</option>
         </select>
-        <input type="text" placeholder="🔍 Search client name or phone..." style="width: 250px;">
+        <input type="text" id="searchInput" placeholder="🔍 Search client name or phone..." style="width: 250px;">
     </div>
 
     <div class="tabs">
-        <div class="tab active">📊 All Cases <span class="count">47</span></div>
-        <div class="tab">Kathy Garcia <span class="count">8</span></div>
-        <div class="tab">Anthony Jimenez <span class="count">6</span></div>
-        <div class="tab">William Gerardo <span class="count">12</span></div>
-        <div class="tab">Christian Delgado <span class="count">7</span></div>
-        <div class="tab">Tony Press <span class="count">5</span></div>
-        <div class="tab">Mariel Arietta <span class="count">4</span></div>
-        <div class="tab">Douglas Regan <span class="count">3</span></div>
-        <div class="tab">Mileida Bohorquez <span class="count">2</span></div>
+        <div class="tab active" data-pod="all">📊 All Cases <span class="count" id="count-all">12</span></div>
+        <div class="tab" data-pod="Kathy Garcia">Kathy Garcia <span class="count" id="count-kathy">3</span></div>
+        <div class="tab" data-pod="Anthony Jimenez">Anthony Jimenez <span class="count" id="count-anthony">2</span></div>
+        <div class="tab" data-pod="William Gerardo">William Gerardo <span class="count" id="count-william">2</span></div>
+        <div class="tab" data-pod="Christian Delgado">Christian Delgado <span class="count" id="count-christian">2</span></div>
+        <div class="tab" data-pod="Tony Press">Tony Press <span class="count" id="count-tony">2</span></div>
+        <div class="tab" data-pod="Douglas Regan">Douglas Regan <span class="count" id="count-douglas">1</span></div>
     </div>
+    
+    <div class="current-filter" id="currentFilter">Showing: All Cases (12)</div>
 
     <div class="content">
         <table>
@@ -112,20 +114,22 @@
                     <th>Client Name</th>
                     <th>Phone</th>
                     <th>Attorney</th>
-                    <th>Rep (updates status)</th>
+                    <th>POD</th>
+                    <th>Rep</th>
                     <th>Reason</th>
                     <th>Age</th>
-                    <th>Status (Rep)</th>
+                    <th>Status</th>
                     <th>Marketing Notes</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
+            <tbody id="caseTable">
+                <tr data-pod="Kathy Garcia" data-status="new" data-attorney="Ask Gary">
                     <td>443140</td>
                     <td>Donaldo Antonio Mendoza</td>
                     <td><a href="tel:3057861584" class="phone-link">(305) 786-1584</a></td>
                     <td>Ask Gary</td>
-                    <td class="rep-col">Marianny Yanez<br><span class="last-action">Last: 5/21 2:30pm</span></td>
+                    <td><strong>Kathy Garcia</strong></td>
+                    <td class="rep-col">Marianny Yanez</td>
                     <td>Cliente no contesta</td>
                     <td><span class="age-badge age-old">5 days</span></td>
                     <td>
@@ -138,12 +142,13 @@
                     </td>
                     <td class="notes-cell"><input type="text" class="notes-input" value="Called 3x no answer"></td>
                 </tr>
-                <tr>
+                <tr data-pod="Kathy Garcia" data-status="contacted" data-attorney="Ask Gary">
                     <td>528586</td>
                     <td>William Ezazabal Morales</td>
                     <td><a href="tel:6892427679" class="phone-link">(689) 242-7679</a></td>
                     <td>Ask Gary</td>
-                    <td class="rep-col">Robin Rodas<br><span class="last-action">Last: 5/22 9:15am</span></td>
+                    <td><strong>Kathy Garcia</strong></td>
+                    <td class="rep-col">Robin Rodas</td>
                     <td>No disponible</td>
                     <td><span class="age-badge age-medium">2 days</span></td>
                     <td>
@@ -156,12 +161,13 @@
                     </td>
                     <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..."></td>
                 </tr>
-                <tr>
+                <tr data-pod="Kathy Garcia" data-status="waiting" data-attorney="Capitol Injury">
                     <td>514181</td>
                     <td>Rodolfo Carrillo</td>
                     <td><a href="tel:4702741712" class="phone-link">(470) 274-1712</a></td>
                     <td>Capitol Injury</td>
-                    <td class="rep-col">Lady Jimenez<br><span class="last-action">Last: 5/20 11:00am</span></td>
+                    <td><strong>Kathy Garcia</strong></td>
+                    <td class="rep-col">Lady Jimenez</td>
                     <td>Can't reach law firm 2 months</td>
                     <td><span class="age-badge age-old">8 days</span></td>
                     <td>
@@ -174,12 +180,13 @@
                     </td>
                     <td class="notes-cell"><input type="text" class="notes-input" value="Escalated to supervisor"></td>
                 </tr>
-                <tr>
+                <tr data-pod="Anthony Jimenez" data-status="new" data-attorney="Capitol Injury">
                     <td>447106</td>
                     <td>Carlos Eduardo Tovar Vilchez</td>
                     <td><a href="tel:4255502499" class="phone-link">(425) 550-2499</a></td>
                     <td>Capitol Injury</td>
-                    <td class="rep-col">Ingris Ortiz<br><span class="last-action">Last: 5/19 3:45pm</span></td>
+                    <td><strong>Anthony Jimenez</strong></td>
+                    <td class="rep-col">Ingris Ortiz</td>
                     <td>CM not available, 8 months</td>
                     <td><span class="age-badge age-old">12 days</span></td>
                     <td>
@@ -192,12 +199,13 @@
                     </td>
                     <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..."></td>
                 </tr>
-                <tr>
+                <tr data-pod="Anthony Jimenez" data-status="contacted" data-attorney="Bader Law">
                     <td>524671</td>
                     <td>Benjamin Ruiz</td>
                     <td><a href="tel:6785313536" class="phone-link">(678) 531-3536</a></td>
                     <td>Bader Law</td>
-                    <td class="rep-col">Carlos Faria<br><span class="last-action">Last: 5/22 10:30am</span></td>
+                    <td><strong>Anthony Jimenez</strong></td>
+                    <td class="rep-col">Carlos Faria</td>
                     <td>CM no contesta</td>
                     <td><span class="age-badge age-new">1 day</span></td>
                     <td>
@@ -210,41 +218,210 @@
                     </td>
                     <td class="notes-cell"><input type="text" class="notes-input" value="CM said call back"></td>
                 </tr>
-                <tr style="background: #f0fff4;">
+                <tr data-pod="William Gerardo" data-status="new" data-attorney="Buckeye Law">
                     <td>528578</td>
                     <td>Pablo Carrasco</td>
                     <td><a href="tel:9134478154" class="phone-link">(913) 447-8154</a></td>
                     <td>Buckeye Law</td>
-                    <td class="rep-col">Orlando Chinga<br><span class="last-action">Last: 5/22 11:00am</span></td>
+                    <td><strong>William Gerardo</strong></td>
+                    <td class="rep-col">Orlando Chinga</td>
                     <td>No disponible</td>
                     <td><span class="age-badge age-new">1 day</span></td>
                     <td>
-                        <select class="status-select status-resolved">
-                            <option value="new">🔴 New</option>
+                        <select class="status-select status-open">
+                            <option value="new" selected>🔴 New</option>
                             <option value="contacted">🟡 Contacted</option>
                             <option value="waiting">🔵 Waiting</option>
-                            <option value="resolved" selected>🟢 Resolved</option>
+                            <option value="resolved">🟢 Resolved</option>
                         </select>
                     </td>
-                    <td class="notes-cell"><input type="text" class="notes-input" value="Client confirmed appt"></td>
+                    <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..."></td>
+                </tr>
+                <tr data-pod="William Gerardo" data-status="contacted" data-attorney="Ask Gary">
+                    <td>503918</td>
+                    <td>Jackson Frias</td>
+                    <td><a href="tel:7623169287" class="phone-link">(762) 316-9287</a></td>
+                    <td>Ask Gary</td>
+                    <td><strong>William Gerardo</strong></td>
+                    <td class="rep-col">Marc Voltaire</td>
+                    <td>Escalated</td>
+                    <td><span class="age-badge age-medium">3 days</span></td>
+                    <td>
+                        <select class="status-select status-contacted">
+                            <option value="new">🔴 New</option>
+                            <option value="contacted" selected>🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" value="Waiting on treatments"></td>
+                </tr>
+                <tr data-pod="Christian Delgado" data-status="new" data-attorney="Bader Law">
+                    <td>533402</td>
+                    <td>Alberto Chirinos</td>
+                    <td><a href="tel:4709578867" class="phone-link">(470) 957-8867</a></td>
+                    <td>Bader Law</td>
+                    <td><strong>Christian Delgado</strong></td>
+                    <td class="rep-col">Sofia Fernandez</td>
+                    <td>Cliente no contesta</td>
+                    <td><span class="age-badge age-medium">4 days</span></td>
+                    <td>
+                        <select class="status-select status-open">
+                            <option value="new" selected>🔴 New</option>
+                            <option value="contacted">🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..."></td>
+                </tr>
+                <tr data-pod="Christian Delgado" data-status="waiting" data-attorney="Buckeye Law">
+                    <td>499837</td>
+                    <td>Angel Nava</td>
+                    <td><a href="tel:7708029817" class="phone-link">(770) 802-9817</a></td>
+                    <td>Buckeye Law</td>
+                    <td><strong>Christian Delgado</strong></td>
+                    <td class="rep-col">Jennifer Arias</td>
+                    <td>CM no contesta</td>
+                    <td><span class="age-badge age-old">6 days</span></td>
+                    <td>
+                        <select class="status-select status-waiting">
+                            <option value="new">🔴 New</option>
+                            <option value="contacted">🟡 Contacted</option>
+                            <option value="waiting" selected>🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" value="Left voicemail"></td>
+                </tr>
+                <tr data-pod="Tony Press" data-status="new" data-attorney="Ask Gary">
+                    <td>505083</td>
+                    <td>Sandra Milena Barrera</td>
+                    <td><a href="tel:7868781390" class="phone-link">(786) 878-1390</a></td>
+                    <td>Ask Gary</td>
+                    <td><strong>Tony Press</strong></td>
+                    <td class="rep-col">Maria Parra</td>
+                    <td>Cliente no contesta</td>
+                    <td><span class="age-badge age-medium">3 days</span></td>
+                    <td>
+                        <select class="status-select status-open">
+                            <option value="new" selected>🔴 New</option>
+                            <option value="contacted">🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..."></td>
+                </tr>
+                <tr data-pod="Tony Press" data-status="contacted" data-attorney="Capitol Injury">
+                    <td>497840</td>
+                    <td>Luis Castellano</td>
+                    <td><a href="tel:4075484932" class="phone-link">(407) 548-4932</a></td>
+                    <td>Capitol Injury</td>
+                    <td><strong>Tony Press</strong></td>
+                    <td class="rep-col">Olga Lopez</td>
+                    <td>No disponible</td>
+                    <td><span class="age-badge age-old">7 days</span></td>
+                    <td>
+                        <select class="status-select status-contacted">
+                            <option value="new">🔴 New</option>
+                            <option value="contacted" selected>🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" value="Will call offices"></td>
+                </tr>
+                <tr data-pod="Douglas Regan" data-status="new" data-attorney="Bader Law">
+                    <td>480057</td>
+                    <td>Rijadson Rijadson</td>
+                    <td><a href="tel:6786830886" class="phone-link">(678) 683-0886</a></td>
+                    <td>Bader Law</td>
+                    <td><strong>Douglas Regan</strong></td>
+                    <td class="rep-col">Talik Morgan</td>
+                    <td>CM no contesta</td>
+                    <td><span class="age-badge age-old">9 days</span></td>
+                    <td>
+                        <select class="status-select status-open">
+                            <option value="new" selected>🔴 New</option>
+                            <option value="contacted">🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" value="Left message"></td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <script>
-        // Tab switching
+        let currentPod = 'all';
+        
+        // Tab switching with filtering
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
+                currentPod = tab.dataset.pod;
+                filterTable();
             });
         });
+        
+        // Status and attorney filters
+        document.getElementById('statusFilter').addEventListener('change', filterTable);
+        document.getElementById('attorneyFilter').addEventListener('change', filterTable);
+        document.getElementById('searchInput').addEventListener('input', filterTable);
+        
+        function filterTable() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const attorneyFilter = document.getElementById('attorneyFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const rows = document.querySelectorAll('#caseTable tr');
+            let visibleCount = 0;
+            let newCount = 0, contactedCount = 0, waitingCount = 0;
+            
+            rows.forEach(row => {
+                const pod = row.dataset.pod;
+                const status = row.dataset.status;
+                const attorney = row.dataset.attorney;
+                const text = row.textContent.toLowerCase();
+                
+                const podMatch = currentPod === 'all' || pod === currentPod;
+                const statusMatch = !statusFilter || status === statusFilter;
+                const attorneyMatch = !attorneyFilter || attorney === attorneyFilter;
+                const searchMatch = !searchTerm || text.includes(searchTerm);
+                
+                if (podMatch && statusMatch && attorneyMatch && searchMatch) {
+                    row.classList.remove('hidden');
+                    visibleCount++;
+                    if (status === 'new') newCount++;
+                    if (status === 'contacted') contactedCount++;
+                    if (status === 'waiting') waitingCount++;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+            
+            // Update stats
+            document.getElementById('stat-total').textContent = visibleCount;
+            document.getElementById('stat-new').textContent = newCount;
+            document.getElementById('stat-contacted').textContent = contactedCount;
+            document.getElementById('stat-waiting').textContent = waitingCount;
+            
+            // Update filter display
+            const filterText = currentPod === 'all' ? 'All Cases' : currentPod;
+            document.getElementById('currentFilter').textContent = `Showing: ${filterText} (${visibleCount} cases)`;
+        }
         
         // Status color update
         document.querySelectorAll('.status-select').forEach(select => {
             select.addEventListener('change', function() {
                 this.className = 'status-select status-' + this.value;
+                // Update row's data-status
+                this.closest('tr').dataset.status = this.value;
+                filterTable();
             });
         });
     </script>
