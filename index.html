@@ -24,11 +24,15 @@
         th { background: #1a365d; color: white; padding: 15px; text-align: left; font-weight: 500; }
         td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
         tr:hover { background: #f7fafc; }
-        .status-open { background: #fed7d7; color: #c53030; padding: 4px 10px; border-radius: 12px; font-size: 12px; }
-        .status-progress { background: #fefcbf; color: #975a16; padding: 4px 10px; border-radius: 12px; font-size: 12px; }
-        .status-resolved { background: #c6f6d5; color: #276749; padding: 4px 10px; border-radius: 12px; font-size: 12px; }
+        .status-select { padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 13px; cursor: pointer; }
+        .status-open { background: #fed7d7; color: #c53030; }
+        .status-contacted { background: #fefcbf; color: #975a16; }
+        .status-waiting { background: #bee3f8; color: #2b6cb0; }
+        .status-resolved { background: #c6f6d5; color: #276749; }
         .btn { background: #2c5282; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
         .btn:hover { background: #1a365d; }
+        .btn-secondary { background: #718096; }
+        .btn-secondary:hover { background: #4a5568; }
         .phone-link { color: #2c5282; text-decoration: none; }
         .notes-cell { max-width: 200px; }
         .notes-input { width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 13px; }
@@ -38,12 +42,14 @@
         .age-new { background: #c6f6d5; color: #276749; }
         .age-old { background: #fed7d7; color: #c53030; }
         .age-medium { background: #fefcbf; color: #975a16; }
+        .rep-col { font-weight: 500; color: #2c5282; }
+        .last-action { font-size: 12px; color: #718096; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🔄 Retention Workflow - Unresolved Cases</h1>
-        <p>Interactive dashboard for retention team & marketing coordination</p>
+        <p>Marketing coordination with reps • Reps update status when resolved</p>
     </div>
     
     <div class="stats">
@@ -53,24 +59,25 @@
         </div>
         <div class="stat-card">
             <h3>12</h3>
-            <p>Open Today</p>
+            <p>New Today</p>
         </div>
         <div class="stat-card">
-            <h3>8</h3>
-            <p>In Progress</p>
+            <h3>18</h3>
+            <p>Contacted</p>
         </div>
         <div class="stat-card">
-            <h3>5</h3>
-            <p>Resolved Today</p>
+            <h3>9</h3>
+            <p>Waiting on Client</p>
         </div>
     </div>
 
     <div class="filter-bar">
         <select id="statusFilter">
             <option value="">All Statuses</option>
-            <option value="open">Open</option>
-            <option value="progress">In Progress</option>
-            <option value="resolved">Resolved</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="waiting">Waiting on Client</option>
+            <option value="resolved">Resolved by Rep</option>
         </select>
         <select id="attorneyFilter">
             <option value="">All Attorneys</option>
@@ -80,7 +87,7 @@
             <option value="capitol">Capitol Injury</option>
         </select>
         <input type="text" placeholder="🔍 Search client name or phone..." style="width: 250px;">
-        <button class="btn">+ Add New Case</button>
+        <button class="btn btn-secondary">📤 Export to Sheet</button>
     </div>
 
     <div class="tabs">
@@ -103,12 +110,11 @@
                     <th>Client Name</th>
                     <th>Phone</th>
                     <th>Attorney</th>
-                    <th>Rep</th>
+                    <th>Rep (updates status)</th>
                     <th>Reason</th>
                     <th>Age</th>
-                    <th>Status</th>
+                    <th>Status (Rep)</th>
                     <th>Marketing Notes</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -117,72 +123,108 @@
                     <td>Donaldo Antonio Mendoza</td>
                     <td><a href="tel:3057861584" class="phone-link">(305) 786-1584</a></td>
                     <td>Ask Gary</td>
-                    <td>Marianny Yanez</td>
+                    <td class="rep-col">Marianny Yanez<br><span class="last-action">Last: 5/21 2:30pm</span></td>
                     <td>Cliente no contesta</td>
                     <td><span class="age-badge age-old">5 days</span></td>
-                    <td><span class="status-open">Open</span></td>
-                    <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." value="Called 3x no answer"></td>
-                    <td><button class="btn">✓ Resolve</button></td>
+                    <td>
+                        <select class="status-select status-open">
+                            <option value="new" selected>🔴 New</option>
+                            <option value="contacted">🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" value="Called 3x no answer"></td>
                 </tr>
                 <tr>
                     <td>528586</td>
                     <td>William Ezazabal Morales</td>
                     <td><a href="tel:6892427679" class="phone-link">(689) 242-7679</a></td>
                     <td>Ask Gary</td>
-                    <td>Robin Rodas</td>
+                    <td class="rep-col">Robin Rodas<br><span class="last-action">Last: 5/22 9:15am</span></td>
                     <td>No disponible</td>
                     <td><span class="age-badge age-medium">2 days</span></td>
-                    <td><span class="status-progress">In Progress</span></td>
+                    <td>
+                        <select class="status-select status-contacted">
+                            <option value="new">🔴 New</option>
+                            <option value="contacted" selected>🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
                     <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..."></td>
-                    <td><button class="btn">✓ Resolve</button></td>
                 </tr>
                 <tr>
                     <td>514181</td>
                     <td>Rodolfo Carrillo</td>
                     <td><a href="tel:4702741712" class="phone-link">(470) 274-1712</a></td>
                     <td>Capitol Injury</td>
-                    <td>Lady Jimenez</td>
+                    <td class="rep-col">Lady Jimenez<br><span class="last-action">Last: 5/20 11:00am</span></td>
                     <td>Can't reach law firm 2 months</td>
                     <td><span class="age-badge age-old">8 days</span></td>
-                    <td><span class="status-open">Open</span></td>
-                    <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." value="Escalated to supervisor"></td>
-                    <td><button class="btn">✓ Resolve</button></td>
+                    <td>
+                        <select class="status-select status-waiting">
+                            <option value="new">🔴 New</option>
+                            <option value="contacted">🟡 Contacted</option>
+                            <option value="waiting" selected>🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" value="Escalated to supervisor"></td>
                 </tr>
                 <tr>
                     <td>447106</td>
                     <td>Carlos Eduardo Tovar Vilchez</td>
                     <td><a href="tel:4255502499" class="phone-link">(425) 550-2499</a></td>
                     <td>Capitol Injury</td>
-                    <td>Ingris Ortiz</td>
+                    <td class="rep-col">Ingris Ortiz<br><span class="last-action">Last: 5/19 3:45pm</span></td>
                     <td>CM not available, 8 months</td>
                     <td><span class="age-badge age-old">12 days</span></td>
-                    <td><span class="status-open">Open</span></td>
+                    <td>
+                        <select class="status-select status-open">
+                            <option value="new" selected>🔴 New</option>
+                            <option value="contacted">🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
                     <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..."></td>
-                    <td><button class="btn">✓ Resolve</button></td>
                 </tr>
                 <tr>
                     <td>524671</td>
                     <td>Benjamin Ruiz</td>
                     <td><a href="tel:6785313536" class="phone-link">(678) 531-3536</a></td>
                     <td>Bader Law</td>
-                    <td>Carlos Faria</td>
+                    <td class="rep-col">Carlos Faria<br><span class="last-action">Last: 5/22 10:30am</span></td>
                     <td>CM no contesta</td>
                     <td><span class="age-badge age-new">1 day</span></td>
-                    <td><span class="status-open">Open</span></td>
-                    <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." value="CM said call back when available"></td>
-                    <td><button class="btn">✓ Resolve</button></td>
+                    <td>
+                        <select class="status-select status-contacted">
+                            <option value="new">🔴 New</option>
+                            <option value="contacted" selected>🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved">🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" value="CM said call back"></td>
                 </tr>
-                <tr>
+                <tr style="background: #f0fff4;">
                     <td>528578</td>
                     <td>Pablo Carrasco</td>
                     <td><a href="tel:9134478154" class="phone-link">(913) 447-8154</a></td>
                     <td>Buckeye Law</td>
-                    <td>Orlando Chinga</td>
+                    <td class="rep-col">Orlando Chinga<br><span class="last-action">Last: 5/22 11:00am</span></td>
                     <td>No disponible</td>
                     <td><span class="age-badge age-new">1 day</span></td>
-                    <td><span class="status-resolved">Resolved</span></td>
-                    <td class="notes-cell"><input type="text" class="notes-input" placeholder="Add note..." value="Client confirmed appointment"></td>
-                    <td><button class="btn" disabled style="opacity:0.5">✓ Done</button></td>
+                    <td>
+                        <select class="status-select status-resolved">
+                            <option value="new">🔴 New</option>
+                            <option value="contacted">🟡 Contacted</option>
+                            <option value="waiting">🔵 Waiting</option>
+                            <option value="resolved" selected>🟢 Resolved</option>
+                        </select>
+                    </td>
+                    <td class="notes-cell"><input type="text" class="notes-input" value="Client confirmed appt"></td>
                 </tr>
             </tbody>
         </table>
@@ -194,6 +236,13 @@
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
+            });
+        });
+        
+        // Status color update
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', function() {
+                this.className = 'status-select status-' + this.value;
             });
         });
     </script>
